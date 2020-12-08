@@ -59,6 +59,8 @@ elif version_info[0]==3:
     from tkinter    import Tk, Frame, Canvas, IntVar
     from tkinter    import Button, Menubutton, Menu
     from tkinter    import RIGHT, LEFT, RAISED, NORMAL, HIDDEN
+import platform
+import ctypes
 from numpy      import array, empty, zeros
 from component  import And, Or, Not, Fuse, Wire, InPin, OutPin
 import circuits
@@ -868,16 +870,24 @@ def options( a ):
             default = Pla.n_and
     )
 
-args            = OptionParser( Pla.usage )
-options( args )
-( opts, more )  = args.parse_args()
-Pla.x_size      = opts.x_size
-Pla.n_inputs    = opts.n_inputs
-Pla.n_outputs   = opts.n_outputs
-Pla.n_and       = opts.n_and
+if __name__ == "__main__":
+    args            = OptionParser( Pla.usage )
+    options( args )
+    ( opts, more )  = args.parse_args()
+    Pla.x_size      = opts.x_size
+    Pla.n_inputs    = opts.n_inputs
+    Pla.n_outputs   = opts.n_outputs
+    Pla.n_and       = opts.n_and
 
-sim             = Tk()
-pla             = Pla( sim )
-sim.attributes( '-topmost', 1 )     # per porre la finestra in primo piano
-pla.place_components()
-sim.mainloop()
+    if platform.system() == "Windows":
+        release = platform.release()
+        if release in ("8", "10"):
+            ctypes.windll.shcore.SetProcessDpiAwareness(1)
+        elif release in ("Vista", "7"):
+            ctypes.windll.user32.SetProcessDPIAware()
+
+    sim             = Tk()
+    pla             = Pla( sim )
+    sim.attributes( '-topmost', 1 )     # per porre la finestra in primo piano
+    pla.place_components()
+    sim.mainloop()
